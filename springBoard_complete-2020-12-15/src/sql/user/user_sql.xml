@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="user">
+
+	<resultMap type="com.spring.user.vo.UserJoinDataVO" id="userJoinDataVo">	<!-- 회원가입 DB양식-->
+		<result property="userID" column="USER_ID"/>
+		<result property="userPW" column="USER_PW"/>
+		<result property="userName" column="USER_NAME"/>
+		<result property="userPhone1" column="USER_PHONE1"/> <!-- 010 -->
+		<result property="userPhone2" column="USER_PHONE2"/> <!-- 3124 -->
+		<result property="userPhone3" column="USER_PHONE3"/> <!-- 2343 -->
+		<result property="userAddr1" column="USER_ADDR1"/>	 <!-- postNo -->
+		<result property="userAddr2" column="USER_ADDR2"/> 	 <!-- address -->
+		<result property="userCompany" column="USER_COMPANY"/>
+	</resultMap>
+	
+	<resultMap type="com.spring.user.vo.PhoneNumVO" id="phoneNumVo">		<!-- 휴대전화번호 앞자리 가져올 때 씀-->
+		<result property="codeId" column="CODE_ID" />					<!-- codeId는 1,2,3,4,5 가 있다. -->
+		<result property="codeName" column="CODE_NAME" />				<!-- 010, 011, 016, 017, 019 -->
+	</resultMap>
+
+	<resultMap type="com.spring.user.vo.LoginDataVO" id="loginData">		<!-- 로그인의 리턴 타입-->
+		<result property="loginID" column="USER_ID" />					
+		<result property="loginPW" column="USER_PW" />
+		<result property="loginUserName" column="USER_NAME" />
+		
+	</resultMap>
+	
+	<!-- 회원가입 -->
+	<insert id="userInsert" parameterType="com.spring.user.vo.UserJoinDataVO">
+		insert into user_info
+		(
+		USER_ID,
+		USER_PW,
+		USER_NAME,
+		USER_PHONE1,
+		USER_PHONE2,
+		USER_PHONE3,
+		USER_ADDR1,
+		USER_ADDR2,
+		USER_COMPANY
+		)
+		values
+		(
+		#{userID},
+		#{userPW},
+		#{userName},
+		#{userPhone1},
+		#{userPhone2},
+		#{userPhone3},
+		#{userAddr1},
+		#{userAddr2},
+		#{userCompany}
+		)
+	</insert>
+
+	<!-- 폰번호 앞자리 가져오기용 -->
+	<select id="getPhoneNum_1List" resultMap="phoneNumVo">
+		SELECT
+		CODE_ID,
+		CODE_NAME
+		FROM COM_CODE 
+		where CODE_TYPE='phone'
+	</select>
+
+	<!-- 회원가입시 아이디 체크 -->
+	<select id="countUserID" parameterType="com.spring.user.vo.UserJoinDataVO" resultType="int">
+		SELECT COUNT(USER_ID) FROM user_info WHERE USER_ID=#{userID}
+	</select>
+	
+	<!-- 로그인 할때 회원정보 가져오기 -->
+	<select id="getUserData" parameterType="com.spring.user.vo.LoginDataVO" resultMap="loginData">
+		SELECT 
+		USER_ID, 
+		USER_PW,
+		USER_NAME 
+		FROM user_info 
+		WHERE user_id=#{loginID} and user_pw=#{loginPW}
+	</select>
+	
+</mapper>
